@@ -24,9 +24,10 @@ A production-ready FastAPI application demonstrating enterprise-level developmen
 - **Testing Ready**: Structured for unit and integration testing
 
 ### 📚 Interactive Documentation
-- **Swagger UI**: Interactive API testing at `/docs`
+- **Swagger UI**: Interactive API testing at `/docs` - Enhanced with detailed descriptions and quick start guide!
 - **ReDoc**: Beautiful API documentation at `/redoc`
 - **OpenAPI Schema**: Complete schema available at `/openapi.json`
+- **Tutorial Guide**: Complete learning guide in [tutorials.md](tutorials.md) - Learn all concepts in simple English!
 
 ## 🚀 Quick Start
 
@@ -60,9 +61,29 @@ A production-ready FastAPI application demonstrating enterprise-level developmen
 
 5. **Access the API**
    - **API Server**: http://localhost:8000
-   - **Interactive Docs**: http://localhost:8000/docs
+   - **Interactive Docs**: http://localhost:8000/docs (Enhanced with beautiful descriptions!)
    - **ReDoc**: http://localhost:8000/redoc
    - **Health Check**: http://localhost:8000/health
+
+## 📚 Learning Guide
+
+**New to FastAPI?** Check out our comprehensive tutorial guide!
+
+👉 **[Read tutorials.md](tutorials.md)** - A complete guide explaining all concepts in simple English
+
+The tutorial covers:
+- What is FastAPI and why use it
+- Setting up your application
+- Understanding Pydantic models (data validation)
+- JWT authentication explained with simple analogies
+- CRUD operations (Create, Read, Update, Delete)
+- Middleware and error handling
+- Dependencies and security
+- Pagination and filtering
+- Testing your API
+- Best practices and common pitfalls
+
+Perfect for beginners! Uses simple language and real-world analogies like waiters, movie tickets, and security guards.
 
 ## 📖 API Documentation
 

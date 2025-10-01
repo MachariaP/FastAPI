@@ -452,65 +452,101 @@ async def lifespan(app: FastAPI):
 
 # FastAPI app configuration
 app = FastAPI(
-    title="Comprehensive FastAPI Example",
+    title="🚀 Comprehensive FastAPI Example",
     description="""
-    ## 🚀 A Production-Ready FastAPI Application
+# Welcome to the Comprehensive FastAPI Demo! 👋
 
-    This application demonstrates enterprise-level FastAPI development patterns and best practices.
+This is a **production-ready FastAPI application** that demonstrates enterprise-level development patterns and best practices. Perfect for learning and as a starting point for your own projects!
 
-    ### 🔐 Authentication & Security
-    - **JWT Authentication**: Secure token-based authentication system
-    - **Password Security**: Bcrypt hashing with salt
-    - **Protected Routes**: Role-based access control
-    - **Security Headers**: CORS and security middleware
+---
 
-    ### 📊 Data Management
-    - **CRUD Operations**: Complete Create, Read, Update, Delete operations
-    - **Data Validation**: Comprehensive Pydantic models with validation
-    - **Filtering & Search**: Advanced query capabilities
-    - **Pagination**: Efficient data pagination with offset/limit
+## 🎯 Quick Start - Test the API in 3 Steps!
 
-    ### 🛠️ Features & Quality
-    - **Error Handling**: Comprehensive HTTP exception handling
-    - **Request Logging**: Detailed request/response logging
-    - **API Documentation**: Auto-generated OpenAPI/Swagger docs
-    - **Type Safety**: Full type hints and validation
-    - **Testing Ready**: Structured for unit and integration testing
+1. **Click the 🔒 Authorize button** at the top right
+2. **Use these test credentials**:
+   - Username: `admin`
+   - Password: `password`
+3. **Try any endpoint** marked with 🔒
 
-    ### 🎯 Quick Start Guide
-    1. **Install**: `pip install -r requirements.txt`
-    2. **Configure**: Copy `.env.example` to `.env` and set values
-    3. **Run**: `uvicorn main:app --reload`
-    4. **Explore**: Visit `/docs` for interactive API documentation
+> 💡 **Tip**: All endpoints below have **"Try it out"** buttons - click them to test the API directly!
 
-    ### 📚 API Organization
-    The API is organized into logical sections:
-    - **Authentication**: User registration, login, token management
-    - **Users**: User profile management and operations
-    - **Items**: Product/item management with advanced features
-    - **System**: Health checks and system information
+---
 
-    ### 🔑 Authentication Quick Start
-    1. **Register**: `POST /auth/register` with email and password
-    2. **Login**: `POST /auth/login` to get access token
-    3. **Use Token**: Include `Authorization: Bearer <token>` in headers
-    4. **Test**: Use the 🔒 Authorize button in Swagger UI
+## 🔐 Authentication & Security
 
-    ### 📖 Response Format
-    All API responses follow a consistent format:
-    ```json
-    {
-        "data": {},
-        "message": "Success",
-        "status": "success"
-    }
-    ```
+Our authentication system uses **JSON Web Tokens (JWT)** for secure access:
+
+- ✅ **JWT Authentication**: Industry-standard token-based security
+- ✅ **Password Protection**: Secure password hashing
+- ✅ **Role-Based Access**: Control who can access what
+- ✅ **CORS Support**: Safe cross-origin requests
+
+**How to authenticate:**
+1. Register a new account at `/auth/register` OR use the default `admin` account
+2. Login at `/auth/login` to get your access token
+3. Click the 🔒 Authorize button and paste your token
+4. Now you can access all protected endpoints!
+
+---
+
+## 📊 Data Management Features
+
+**Full CRUD Operations** - Create, Read, Update, and Delete:
+- ✨ **Smart Validation**: Automatic data validation with helpful error messages
+- 🔍 **Advanced Search**: Filter, search, and sort your data
+- 📄 **Pagination**: Handle large datasets efficiently
+- 🎨 **Flexible Queries**: Combine multiple filters for precise results
+
+---
+
+## 🛠️ Built-In Quality Features
+
+- ⚡ **Fast Performance**: Async/await for high concurrency
+- 🎯 **Type Safety**: Full type hints prevent bugs
+- 📝 **Auto Documentation**: This page updates automatically!
+- 🔔 **Error Handling**: Clear, helpful error messages
+- 📊 **Request Logging**: Track all API activity
+- ✅ **Input Validation**: Catch problems before they happen
+
+---
+
+## 📚 API Organization
+
+Endpoints are organized into clear sections (see below):
+
+| Section | Purpose | Examples |
+|---------|---------|----------|
+| 🔐 **Authentication** | User registration & login | Register, Login, Get current user |
+| 👥 **Users** | User management | List users, Get user details |
+| 📦 **Items** | Product/item management | Create items, Search, Filter by category |
+| 💓 **Health** | System monitoring | Health checks, Configuration |
+| 📊 **Statistics** | Analytics & insights | User stats, Item statistics |
+
+---
+
+## 📖 Need Help?
+
+- 🆘 Visit `/auth/help` for detailed authentication instructions
+- 📖 Visit `/api/info` for a complete API overview
+- 💡 All endpoints have detailed descriptions and examples below
+- 🧪 Use the **"Try it out"** feature to test endpoints interactively
+
+---
+
+## 🎓 Learning Resources
+
+Want to learn more about FastAPI? Check out:
+- Official FastAPI documentation
+- Pydantic for data validation
+- JWT authentication guides
+
+**Happy API testing!** 🎉
     """,
     version="1.0.0",
     contact={
         "name": "API Development Team",
         "email": "api-support@example.com",
-        "url": "https://github.com/example/fastapi-demo"
+        "url": "https://github.com/MachariaP/FastAPI"
     },
     license_info={
         "name": "MIT License",
@@ -519,79 +555,179 @@ app = FastAPI(
     servers=[
         {
             "url": "http://localhost:8000",
-            "description": "Development server"
+            "description": "🏠 Local Development Server"
         },
         {
             "url": "https://api.example.com",
-            "description": "Production server"
+            "description": "🌐 Production Server"
         }
     ],
     tags_metadata=[
         {
+            "name": "Health",
+            "description": """
+## 💓 Health & System Status
+
+Quick endpoints to check if the API is running and healthy.
+
+**Perfect for:**
+- 🔍 Monitoring systems and uptime checks
+- ⚖️ Load balancer health checks
+- 🚀 CI/CD pipeline validations
+- 📊 System diagnostics
+
+**Available Endpoints:**
+- `GET /` - Quick health check
+- `GET /health` - Detailed system information
+- `GET /config` - Application configuration
+
+> 💡 **Tip**: These endpoints don't require authentication - they're always available!
+            """
+        },
+        {
             "name": "Authentication",
             "description": """
-            **User Authentication & Authorization**
-            
-            Complete authentication system with JWT tokens. These endpoints handle:
-            - User registration with validation
-            - Secure login with password verification
-            - Token generation and validation
-            - Authentication status checking
-            
-            **Quick Test**: Use the register → login → authorize workflow in Swagger UI.
+## 🔐 User Authentication & Authorization
+
+Complete authentication system powered by **JWT (JSON Web Tokens)**.
+
+**What you can do:**
+- ✅ Register new user accounts with validation
+- ✅ Login securely to get access tokens
+- ✅ Verify your identity with tokens
+- ✅ Check your authentication status
+
+**🚀 Quick Start (3 easy steps):**
+
+1. **Test with default user** (fastest way):
+   - Username: `admin`
+   - Password: `password`
+   - Use `POST /auth/login` endpoint below
+
+2. **Or register your own account**:
+   - Use `POST /auth/register` 
+   - Fill in your details
+   - Then login to get your token
+
+3. **Authorize and test**:
+   - Click the 🔒 **Authorize** button at top right
+   - Paste your token
+   - Now test any protected endpoint!
+
+> 📚 **Need detailed help?** Visit the `/auth/help` endpoint for comprehensive examples and troubleshooting!
             """,
             "externalDocs": {
-                "description": "Authentication Guide",
+                "description": "📖 FastAPI Security Tutorial",
                 "url": "https://fastapi.tiangolo.com/tutorial/security/"
             }
         },
         {
             "name": "Users",
             "description": """
-            **User Management Operations**
-            
-            Comprehensive user profile management including:
-            - User creation and registration
-            - Profile retrieval and updates
-            - User listing with pagination
-            - Account management operations
-            
-            **Note**: Most operations require authentication. Use the 🔒 Authorize button first.
+## 👥 User Management
+
+Manage user profiles and accounts in the system.
+
+**Available Operations:**
+- 👤 View user profiles and details
+- 📋 List all users (with pagination)
+- 📦 Get user's items and content
+- ⚙️ User account management
+
+**Features:**
+- ✅ Pagination support for large user lists
+- ✅ Detailed user information
+- ✅ User-item relationships
+- ✅ Protected by authentication
+
+> 🔒 **Authentication Required**: You must be logged in to access these endpoints. Click the Authorize button first!
             """,
             "externalDocs": {
-                "description": "User Management Best Practices",
+                "description": "📖 User Management Guide",
                 "url": "https://fastapi.tiangolo.com/tutorial/sql-databases/"
             }
         },
         {
             "name": "Items",
             "description": """
-            **Item/Product Management**
-            
-            Full-featured item management system with:
-            - CRUD operations (Create, Read, Update, Delete)
-            - Advanced filtering and search capabilities
-            - Pagination for large datasets
-            - Ownership and permission controls
-            
-            **Features**: Search by name, filter by owner, paginate results.
+## 📦 Item & Product Management
+
+Full-featured system for managing items, products, or any inventory.
+
+**CRUD Operations** (Create, Read, Update, Delete):
+- ➕ Create new items (authenticated users)
+- 📖 View all items (public access)
+- ✏️ Update your items
+- 🗑️ Delete your items
+
+**Advanced Features:**
+- 🔍 **Search**: Find items by name, description, or category
+- 🎯 **Filter**: Category, price range, owner
+- 📊 **Sort**: By name, price, date created/updated
+- 📄 **Paginate**: Handle thousands of items efficiently
+
+**Example Categories:**
+Electronics, Books, Clothing, Home, Sports, Toys, etc.
+
+**Ownership & Permissions:**
+- Anyone can view items
+- Only the owner (or admin) can update/delete items
+- Each item is linked to its creator
+
+> 💡 **Try it**: Use `GET /items/search` for powerful search capabilities!
             """,
             "externalDocs": {
-                "description": "CRUD Operations Guide",
+                "description": "📖 CRUD Operations Guide",
                 "url": "https://fastapi.tiangolo.com/tutorial/sql-databases/#crud-operations"
             }
         },
         {
-            "name": "System",
+            "name": "Configuration",
             "description": """
-            **System Information & Health**
-            
-            Monitoring and system information endpoints:
-            - Health checks for monitoring systems
-            - API status and version information
-            - System metrics and diagnostics
-            
-            **Use Case**: Perfect for monitoring, load balancers, and CI/CD systems.
+## ⚙️ Configuration & Settings
+
+View application configuration and settings.
+
+**What you can see:**
+- Application name and version
+- Environment (development/production)
+- Token expiration settings
+- Debug mode status
+
+> 🔒 **Note**: Sensitive information like secret keys are never exposed through these endpoints!
+            """
+        },
+        {
+            "name": "Statistics",
+            "description": """
+## 📊 Analytics & Statistics
+
+Get insights and statistics about the application data.
+
+**Available Metrics:**
+- 👥 Total users count
+- 📦 Total items count
+- 🏷️ Items by category
+- 💰 Average prices
+- 📈 Your personal statistics
+
+> 🔒 **Authentication Required**: Login to see statistics and analytics!
+            """
+        },
+        {
+            "name": "API Information",
+            "description": """
+## ℹ️ API Overview & Help
+
+Comprehensive information about the entire API.
+
+**What you'll find:**
+- 📋 Complete list of all endpoints
+- 🔑 Authentication workflow guide
+- ✨ Available features overview
+- 📖 Documentation links
+
+> 💡 **Perfect for**: Getting a bird's-eye view of the entire API in one place!
             """
         }
     ],
