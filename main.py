@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta, timezone
 import jwt
@@ -33,8 +33,7 @@ class Settings(BaseModel):
     environment: str = Field(default="development")
     cors_origins: List[str] = ["*"]
 
-    class Config:
-        env_file = ".env"
+    model_config = ConfigDict(env_file=".env")
 
 
 # Initialize settings
@@ -124,8 +123,8 @@ class UserCreate(UserBase):
 
     password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "username": "johndoe",
                 "email": "john@example.com",
@@ -133,6 +132,7 @@ class UserCreate(UserBase):
                 "password": "secretpassword123",
             }
         }
+    )
 
 
 class UserResponse(UserBase):
@@ -142,8 +142,7 @@ class UserResponse(UserBase):
     created_at: datetime = Field(..., description="User creation timestamp")
     is_active: bool = Field(True, description="Whether the user is active")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ItemBase(BaseModel):
@@ -158,8 +157,8 @@ class ItemBase(BaseModel):
 class ItemCreate(ItemBase):
     """Model for item creation"""
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "name": "Laptop",
                 "description": "High-performance laptop for developers",
@@ -167,6 +166,7 @@ class ItemCreate(ItemBase):
                 "category": "Electronics",
             }
         }
+    )
 
 
 class ItemUpdate(BaseModel):
@@ -186,8 +186,7 @@ class ItemResponse(ItemBase):
     updated_at: datetime = Field(..., description="Item last update timestamp")
     owner_id: int = Field(..., description="ID of the user who created the item")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -221,14 +220,15 @@ class SuccessResponse(BaseModel):
     message: str = Field(..., description="Human-readable success message")
     data: Optional[Dict[str, Any]] = Field(None, description="Response data")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "success": True,
                 "message": "Operation completed successfully",
                 "data": {"id": 1, "name": "Sample Item"},
             }
         }
+    )
 
 
 class ErrorResponse(BaseModel):
@@ -239,8 +239,8 @@ class ErrorResponse(BaseModel):
     error_code: Optional[str] = Field(None, description="Machine-readable error code")
     details: Optional[Dict[str, Any]] = Field(None, description="Additional error details")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "success": False,
                 "message": "Validation error occurred",
@@ -248,6 +248,7 @@ class ErrorResponse(BaseModel):
                 "details": {"field": "email", "issue": "Invalid email format"},
             }
         }
+    )
 
 
 class AuthResponse(BaseModel):
@@ -258,8 +259,8 @@ class AuthResponse(BaseModel):
     expires_in: int = Field(..., description="Token expiration time in seconds")
     user: UserResponse = Field(..., description="User information")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "token_type": "bearer",
@@ -274,6 +275,7 @@ class AuthResponse(BaseModel):
                 },
             }
         }
+    )
 
 
 class UserListResponse(BaseModel):
@@ -282,8 +284,8 @@ class UserListResponse(BaseModel):
     users: List[UserResponse] = Field(..., description="List of users")
     pagination: PaginatedResponse = Field(..., description="Pagination information")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "users": [
                     {
@@ -298,6 +300,7 @@ class UserListResponse(BaseModel):
                 "pagination": {"items": [], "total": 1, "page": 1, "size": 10, "pages": 1},
             }
         }
+    )
 
 
 class ItemListResponse(BaseModel):
@@ -307,8 +310,8 @@ class ItemListResponse(BaseModel):
     pagination: PaginatedResponse = Field(..., description="Pagination information")
     filters_applied: Optional[Dict[str, Any]] = Field(None, description="Applied filters")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "items": [
                     {
@@ -326,6 +329,7 @@ class ItemListResponse(BaseModel):
                 "filters_applied": {"search": "laptop", "category": "Electronics"},
             }
         }
+    )
 
 
 class HealthCheckResponse(BaseModel):
@@ -337,8 +341,8 @@ class HealthCheckResponse(BaseModel):
     environment: str = Field(..., description="Environment name")
     uptime: str = Field(..., description="Service uptime")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "status": "healthy",
                 "timestamp": "2024-01-01T12:00:00Z",
@@ -347,6 +351,7 @@ class HealthCheckResponse(BaseModel):
                 "uptime": "2 hours, 30 minutes",
             }
         }
+    )
 
 
 # Custom Exceptions
@@ -858,7 +863,7 @@ async def custom_http_exception_handler(request: Request, exc: CustomHTTPExcepti
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle request validation errors"""
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={
             "detail": f"Validation error: {exc.errors()}",
             "error_code": "VALIDATION_ERROR",
