@@ -7,7 +7,7 @@ to ensure 100% code coverage and robust functionality.
 
 import pytest
 from fastapi.testclient import TestClient
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 from main import (
     app,
@@ -30,6 +30,7 @@ def reset_databases():
 
     # Re-add the default admin user
     from main import user_counter as uc
+
     users_db.append(
         {
             "id": 1,
@@ -37,7 +38,7 @@ def reset_databases():
             "email": "admin@example.com",
             "full_name": "Administrator",
             "password_hash": "hashed_password",
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
             "is_active": True,
         }
     )

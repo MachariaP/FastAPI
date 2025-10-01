@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 from jwt import ExpiredSignatureError
 import logging
@@ -55,8 +55,21 @@ security = HTTPBearer(auto_error=False)  # Don't auto-error, let us handle it
 
 
 # Custom authentication dependency with better error messages
-def require_auth(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
-    """Require authentication with helpful error messages"""
+def require_auth(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Dict[str, Any]:
+    """
+    Require authentication with helpful error messages.
+
+    Args:
+        credentials: Optional HTTP authorization credentials from request header
+
+    Returns:
+        Dict[str, Any]: User dictionary containing user information
+
+    Raises:
+        HTTPException: If authentication fails or token is invalid/expired
+    """
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -365,20 +378,42 @@ item_counter = 0
 
 
 # Utility functions
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create JWT access token"""
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """
+    Create JWT access token.
+
+    Args:
+        data: Dictionary containing data to encode in the token
+        expires_delta: Optional token expiration time
+
+    Returns:
+        str: Encoded JWT token
+    """
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token and return current user"""
+def verify_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> Dict[str, Any]:
+    """
+    Verify JWT token and return current user.
+
+    Args:
+        credentials: HTTP authorization credentials
+
+    Returns:
+        Dict[str, Any]: User information dictionary
+
+    Raises:
+        HTTPException: If token is invalid or expired
+    """
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -422,8 +457,16 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 # Optional authentication dependency (for endpoints that can work with or without auth)
 def optional_verify_token(
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
-):
-    """Verify JWT token if provided, return None if not provided"""
+) -> Optional[Dict[str, Any]]:
+    """
+    Verify JWT token if provided, return None if not provided.
+
+    Args:
+        credentials: Optional HTTP authorization credentials
+
+    Returns:
+        Optional[Dict[str, Any]]: User information if token is valid, None otherwise
+    """
     if not credentials:
         return None
 
@@ -440,11 +483,28 @@ def optional_verify_token(
 
 
 def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
-    """Get user by username"""
+    """
+    Get user by username from the database.
+
+    Args:
+        username: Username to search for
+
+    Returns:
+        Optional[Dict[str, Any]]: User dictionary if found, None otherwise
+    """
     return next((user for user in users_db if user["username"] == username), None)
 
 
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
+    """
+    Get user by email from the database.
+
+    Args:
+        email: Email address to search for
+
+    Returns:
+        Optional[Dict[str, Any]]: User dictionary if found, None otherwise
+    """
     """Get user by email"""
     return next((user for user in users_db if user["email"] == email), None)
 
@@ -465,7 +525,7 @@ async def lifespan(app: FastAPI):
         "email": "admin@example.com",
         "full_name": "Administrator",
         "password_hash": "hashed_password",  # In production, hash the password
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "is_active": True,
     }
     users_db.append(sample_user)
@@ -788,7 +848,7 @@ async def custom_http_exception_handler(request: Request, exc: CustomHTTPExcepti
         content={
             "detail": exc.detail,
             "error_code": exc.error_code,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "path": str(request.url),
         },
     )
@@ -802,7 +862,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={
             "detail": f"Validation error: {exc.errors()}",
             "error_code": "VALIDATION_ERROR",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "path": str(request.url),
         },
     )
@@ -816,7 +876,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content={
             "detail": exc.detail,
             "error_code": "HTTP_ERROR",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "path": str(request.url),
         },
     )
@@ -831,7 +891,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         content={
             "detail": "Internal server error",
             "error_code": "INTERNAL_ERROR",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "path": str(request.url),
         },
     )
@@ -841,7 +901,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Log all requests and responses"""
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
 
     # Log request
     logger.info(f"Request: {request.method} {request.url}")
@@ -850,13 +910,13 @@ async def log_requests(request: Request, call_next):
         response = await call_next(request)
 
         # Log response
-        process_time = (datetime.utcnow() - start_time).total_seconds()
+        process_time = (datetime.now(timezone.utc) - start_time).total_seconds()
         logger.info(f"Response: {response.status_code} - {process_time:.4f}s")
 
         return response
     except Exception as e:
         # Log error
-        process_time = (datetime.utcnow() - start_time).total_seconds()
+        process_time = (datetime.now(timezone.utc) - start_time).total_seconds()
         logger.error(f"Request failed: {e} - {process_time:.4f}s")
         raise
 
@@ -881,7 +941,7 @@ async def root():
     return {
         "message": "FastAPI is running!",
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "version": "1.0.0",
     }
 
@@ -1054,7 +1114,7 @@ async def health_check():
     """
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "database": {"users_count": len(users_db), "items_count": len(items_db)},
         "version": "1.0.0",
         "environment": os.getenv("ENVIRONMENT", "development"),
@@ -1331,7 +1391,7 @@ async def register_user(user: UserCreate):
         "email": user.email,
         "full_name": user.full_name,
         "password_hash": f"hashed_{user.password}",  # In production, properly hash the password
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "is_active": True,
     }
 
@@ -1603,7 +1663,7 @@ async def get_items(
     items_page = filtered_items[skip : skip + limit]
 
     return PaginatedResponse(
-        items=[ItemResponse(**item).dict() for item in items_page],
+        items=[ItemResponse(**item).model_dump() for item in items_page],
         total=total,
         page=skip // limit + 1,
         size=len(items_page),
@@ -1734,8 +1794,8 @@ async def create_item(item: ItemCreate, current_user: dict = Depends(require_aut
         "price": item.price,
         "category": item.category,
         "owner_id": current_user["id"],
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
     }
 
     items_db.append(new_item)
@@ -1781,11 +1841,11 @@ async def update_item(
         )
 
     # Update only provided fields
-    update_data = item_update.dict(exclude_unset=True)
+    update_data = item_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         existing_item[field] = value
 
-    existing_item["updated_at"] = datetime.utcnow()
+    existing_item["updated_at"] = datetime.now(timezone.utc)
 
     logger.info(f"Item updated: {item_id} by user {current_user['username']}")
     return ItemResponse(**existing_item)
@@ -1858,5 +1918,5 @@ async def get_statistics(current_user: dict = Depends(require_auth)):
         "your_items": len(user_items),
         "categories": categories,
         "average_price": sum(item["price"] for item in items_db) / len(items_db) if items_db else 0,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
